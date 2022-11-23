@@ -1,125 +1,149 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
+<title>Django To Do List App</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-.gradient-custom {
-  background: radial-gradient(50% 123.47% at 50% 50%, #00ff94 0%, #720059 100%),
-  linear-gradient(121.28deg, #669600 0%, #ff0000 100%),
-  linear-gradient(360deg, #0029ff 0%, #8fff00 100%),
-  radial-gradient(100% 164.72% at 100% 100%, #6100ff 0%, #00ff57 100%),
-  radial-gradient(100% 148.07% at 0% 0%, #fff500 0%, #51d500 100%);
-  background-blend-mode: screen, color-dodge, overlay, difference, normal;
+body {
+  margin: 0;
+  min-width: 250px;
+}
+
+/* Include the padding and border in an element's total width and height */
+* {
+  box-sizing: border-box;
+}
+
+/* Remove margins and padding from the list */
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+/* Style the list items */
+ul li {
+  cursor: pointer;
+  position: relative;
+  padding: 12px 8px 12px 40px;
+  list-style-type: none;
+  background: #eee;
+  font-size: 18px;
+  transition: 0.2s;
+
+  /* make the list items unselectable */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Set all odd list items to a different color (zebra-stripes) */
+ul li:nth-child(odd) {
+  background: #f9f9f9;
+}
+
+/* Darker background-color on hover */
+ul li:hover {
+  background: #ddd;
+}
+
+/* When clicked on, add a background color and strike out text */
+ul li.checked {
+  background: #888;
+  color: #fff;
+  text-decoration: line-through;
+}
+
+/* Add a "checked" mark when clicked on */
+ul li.checked::before {
+  content: '';
+  position: absolute;
+  border-color: #fff;
+  border-style: solid;
+  border-width: 0 2px 2px 0;
+  top: 10px;
+  left: 16px;
+  transform: rotate(45deg);
+  height: 15px;
+  width: 7px;
+}
+
+/* Style the close button */
+.close {
+  position: absolute;
+  right: 0;
+  top: 0;
+  padding: 12px 16px 12px 16px;
+}
+
+.close:hover {
+  background-color: #f44336;
+  color: white;
+}
+
+/* Style the header */
+.header {
+  background-color: #329ba8;
+  padding: 30px 40px;
+  color: white;
+  text-align: center;
+}
+
+/* Clear floats after the header */
+.header:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Style the input */
+input {
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  width: 75%;
+  padding: 10px;
+  float: left;
+  font-size: 16px;
+}
+
+/* Style the "Add" button */
+.addBtn {
+  padding: 10px;
+  width: 25%;
+  background: #d9d9d9;
+  color: #555;
+  float: left;
+  text-align: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+  border-radius: 0;
+}
+
+.addBtn:hover {
+  background-color: #bbb;
 }
 </style>
 </head>
 <body>
-<section class="vh-100 gradient-custom">
-  <div class="container py-5 h-100">
-    <div class="row d-flex justify-content-center align-items-center h-100">
-      <div class="col col-xl-10">
 
-        <div class="card">
-          <div class="card-body p-5">
+<div id="myDIV" class="header">
+  <h2 style="margin:5px">Django To Do List App</h2>
+  <form action="" method="POST">
+    {% csrf_token %}
+    <input type="text" name="task" id="myInput" placeholder="Task...">
+    <input class="form-check-input" type="checkbox">
+    <button type="submit" class="addBtn">Add</button>
+  </form>
+</div>
+<ul id="myUL">
+  {% for todo in todos reversed %}
+  <li>{{todo.task}} <span class="close"><a style="text-decoration: none; color: black;" href="delete/{{todo.id}}">Delete</a>
+    <a style="text-decoration: none; color: black;" href="complete/{{todo.id}}">{{todo.completed}}</a>
+  </span></li>
+  {% endfor %}
+</ul>
 
-            <form class="d-flex justify-content-center align-items-center mb-4">
-              <div class="form-outline flex-fill">
-                <input type="text" id="form2" class="form-control" />
-                <label class="form-label" for="form2">New task...</label>
-              </div>
-              <button type="submit" class="btn btn-info ms-2">Add</button>
-            </form>
-
-            <!-- Tabs navs -->
-            <ul class="nav nav-tabs mb-4 pb-2" id="ex1" role="tablist">
-              <li class="nav-item" role="presentation">
-                <a class="nav-link active" id="ex1-tab-1" data-mdb-toggle="tab" href="#ex1-tabs-1" role="tab"
-                  aria-controls="ex1-tabs-1" aria-selected="true">All</a>
-              </li>
-              <li class="nav-item" role="presentation">
-                <a class="nav-link" id="ex1-tab-2" data-mdb-toggle="tab" href="#ex1-tabs-2" role="tab"
-                  aria-controls="ex1-tabs-2" aria-selected="false">Active</a>
-              </li>
-              <li class="nav-item" role="presentation">
-                <a class="nav-link" id="ex1-tab-3" data-mdb-toggle="tab" href="#ex1-tabs-3" role="tab"
-                  aria-controls="ex1-tabs-3" aria-selected="false">Completed</a>
-              </li>
-            </ul>
-            <!-- Tabs navs -->
-
-            <!-- Tabs content -->
-            <div class="tab-content" id="ex1-content">
-              <div class="tab-pane fade show active" id="ex1-tabs-1" role="tabpanel"
-                aria-labelledby="ex1-tab-1">
-                <ul class="list-group mb-0">
-                  <li class="list-group-item d-flex align-items-center border-0 mb-2 rounded"
-                    style="background-color: #f4f6f7;">
-                    <input class="form-check-input me-2" type="checkbox" value="" aria-label="..." checked />
-                    <s>Cras justo odio</s>
-                  </li>
-                  <li class="list-group-item d-flex align-items-center border-0 mb-2 rounded"
-                    style="background-color: #f4f6f7;">
-                    <input class="form-check-input me-2" type="checkbox" value="" aria-label="..." checked />
-                    <s>Dapibus ac facilisis in</s>
-                  </li>
-                  <li class="list-group-item d-flex align-items-center border-0 mb-2 rounded"
-                    style="background-color: #f4f6f7;">
-                    <input class="form-check-input me-2" type="checkbox" value="" aria-label="..." />
-                    Morbi leo risus
-                  </li>
-                  <li class="list-group-item d-flex align-items-center border-0 mb-2 rounded"
-                    style="background-color: #f4f6f7;">
-                    <input class="form-check-input me-2" type="checkbox" value="" aria-label="..." />
-                    Porta ac consectetur ac
-                  </li>
-                  <li class="list-group-item d-flex align-items-center border-0 mb-0 rounded"
-                    style="background-color: #f4f6f7;">
-                    <input class="form-check-input me-2" type="checkbox" value="" aria-label="..." />
-                    Vestibulum at eros
-                  </li>
-                </ul>
-              </div>
-              <div class="tab-pane fade" id="ex1-tabs-2" role="tabpanel" aria-labelledby="ex1-tab-2">
-                <ul class="list-group mb-0">
-                  <li class="list-group-item d-flex align-items-center border-0 mb-2 rounded"
-                    style="background-color: #f4f6f7;">
-                    <input class="form-check-input me-2" type="checkbox" value="" aria-label="..." />
-                    Morbi leo risus
-                  </li>
-                  <li class="list-group-item d-flex align-items-center border-0 mb-2 rounded"
-                    style="background-color: #f4f6f7;">
-                    <input class="form-check-input me-2" type="checkbox" value="" aria-label="..." />
-                    Porta ac consectetur ac
-                  </li>
-                  <li class="list-group-item d-flex align-items-center border-0 mb-0 rounded"
-                    style="background-color: #f4f6f7;">
-                    <input class="form-check-input me-2" type="checkbox" value="" aria-label="..." />
-                    Vestibulum at eros
-                  </li>
-                </ul>
-              </div>
-              <div class="tab-pane fade" id="ex1-tabs-3" role="tabpanel" aria-labelledby="ex1-tab-3">
-                <ul class="list-group mb-0">
-                  <li class="list-group-item d-flex align-items-center border-0 mb-2 rounded"
-                    style="background-color: #f4f6f7;">
-                    <input class="form-check-input me-2" type="checkbox" value="" aria-label="..." checked />
-                    <s>Cras justo odio</s>
-                  </li>
-                  <li class="list-group-item d-flex align-items-center border-0 mb-2 rounded"
-                    style="background-color: #f4f6f7;">
-                    <input class="form-check-input me-2" type="checkbox" value="" aria-label="..." checked />
-                    <s>Dapibus ac facilisis in</s>
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <!-- Tabs content -->
-
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-</section>
 </body>
 </html>
